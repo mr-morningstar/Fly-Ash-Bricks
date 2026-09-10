@@ -1,0 +1,14 @@
+{
+  "name": "fly-ash-bricks-app",
+  "version": "1.0.0",
+  "description": "Root package to run both frontend and backend",
+  "scripts": {
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "npx http-server ./frontend -p 3000 -c-1",
+    "dev": "npx concurrently \"npm run start:backend\" \"npm run start:frontend\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "http-server": "^14.1.1"
+  }
+}

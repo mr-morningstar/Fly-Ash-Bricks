@@ -1,0 +1,42 @@
+# render.yaml — Render Infrastructure as Code
+# DEV Fly Ash Bricks — Backend Web Service
+# Docs: https://render.com/docs/infrastructure-as-code
+
+services:
+  - type: web
+    name: flyashbricks-backend
+    runtime: node
+    region: singapore          # Closest to India
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false             # Fill manually in Render Dashboard
+      - key: JWT_SECRET
+        generateValue: true     # Render auto-generates a secure value ✅
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_COOKIE_EXPIRES_IN
+        value: 7
+      - key: CLIENT_URL
+        sync: false             # Set to your frontend URL after deploying
+      - key: OWNER_EMAIL
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SEED_ADMIN_EMAIL
+        value: admin@devbricks.com
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      - key: SEED_ADMIN_NAME
+        value: Super Admin

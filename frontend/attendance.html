@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Attendance | DEV Fly Ash Bricks</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/splash.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body class="bg-surface-50 dark:bg-surface-950 text-surface-800 dark:text-surface-200">
+  <div id="layout-wrapper"></div>
+
+  <template id="page-template">
+    <div class="flex flex-col gap-6 max-w-7xl mx-auto">
+
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-black tracking-tight">Attendance</h1>
+          <p class="text-surface-500 dark:text-surface-400 mt-1">Monthly attendance grid — mark, view and bulk update.</p>
+        </div>
+        <div class="flex gap-3 w-full md:w-auto">
+          <button onclick="AttendanceModule.openImportModal()" class="flex-1 md:flex-none px-4 py-2 bg-surface-200 dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-xl font-bold hover:bg-surface-300 dark:hover:bg-surface-700 transition-colors">
+            📥 Import
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap gap-3 p-4 bg-white dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-800 shadow-sm">
+        <select id="att-group-filter" onchange="AttendanceModule.loadGrid()" class="px-3 py-2 bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 rounded-lg text-sm flex-1 min-w-[140px]">
+          <option value="">Select Group</option>
+        </select>
+        <select id="att-month-filter" onchange="AttendanceModule.loadGrid()" class="px-3 py-2 bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 rounded-lg text-sm">
+        </select>
+        <select id="att-year-filter" onchange="AttendanceModule.loadGrid()" class="px-3 py-2 bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 rounded-lg text-sm">
+        </select>
+        <button onclick="AttendanceModule.saveAllBulk()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition-all shadow-sm">
+          💾 Save All
+        </button>
+      </div>
+
+      <!-- Legend -->
+      <div class="flex gap-3 flex-wrap text-xs font-bold">
+        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full">P = Present</span>
+        <span class="px-3 py-1 bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 rounded-full">A = Absent</span>
+        <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full">HD = Half Day</span>
+        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">FD = Full Day</span>
+      </div>
+
+      <!-- Grid Container -->
+      <div id="att-grid-container" class="overflow-x-auto rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 shadow-sm">
+        <div class="p-12 text-center text-surface-500">
+          <span class="text-4xl block mb-3">📅</span>
+          Select a group and month to view the attendance grid.
+        </div>
+      </div>
+
+    </div>
+    <div id="import-modal-wrap"></div>
+  </template>
+
+  <script src="js/config.js"></script><script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/attendance.js"></script>
+</body>
+</html>

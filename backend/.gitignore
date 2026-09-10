@@ -1,0 +1,10 @@
+node_modules/
+.env
+uploads/avatars/*
+uploads/bills/*
+uploads/logos/*
+uploads/qrcodes/*
+!uploads/.gitkeep
+logs/
+*.log
+dist/

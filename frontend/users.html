@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Users | DEV Fly Ash Bricks</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/splash.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body class="bg-surface-50 dark:bg-surface-950 text-surface-800 dark:text-surface-200">
+  <div id="layout-wrapper"></div>
+
+  <template id="page-template">
+    <div class="flex flex-col gap-6 max-w-5xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-black tracking-tight">System Users</h1>
+          <p class="text-surface-500 dark:text-surface-400 mt-1">Manage ERP access — create, edit, and control user permissions.</p>
+        </div>
+        <button onclick="UsersModule.openCreateModal()" class="w-full md:w-auto px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/30">+ New User</button>
+      </div>
+
+      <div id="table-container"></div>
+      <div id="pagination-container"></div>
+    </div>
+    <div id="user-modal-wrap"></div>
+  </template>
+
+  <script src="js/config.js"></script><script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/users.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Production | DEV Fly Ash Bricks</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/splash.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body class="bg-surface-50 dark:bg-surface-950 text-surface-800 dark:text-surface-200">
+  <div id="layout-wrapper"></div>
+
+  <template id="page-template">
+    <div class="flex flex-col gap-6 max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-black tracking-tight">Production Log</h1>
+          <p class="text-surface-500 dark:text-surface-400 mt-1">Enter daily brick production and track material consumption.</p>
+        </div>
+        <div class="flex gap-3 w-full md:w-auto">
+          <button onclick="ProductionModule.openImportModal()" class="flex-1 md:flex-none px-4 py-2 bg-surface-200 dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-xl font-bold hover:bg-surface-300 dark:hover:bg-surface-700 transition-colors">📥 Import</button>
+          <button onclick="ProductionModule.openEntryModal()" class="flex-1 md:flex-none px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/30">+ Log Production</button>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="flex flex-wrap gap-3 p-4 bg-white dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-800 shadow-sm">
+        <input type="date" id="prod-date-filter" class="px-3 py-2 bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 rounded-lg text-sm">
+        <button onclick="ProductionModule.applyFilter()" class="px-4 py-2 bg-surface-800 dark:bg-surface-700 text-white rounded-lg hover:bg-surface-700 dark:hover:bg-surface-600 transition-colors text-sm font-bold">Apply</button>
+        <button onclick="ProductionModule.clearFilter()" class="px-4 py-2 bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors text-sm font-bold">Clear</button>
+      </div>
+
+      <div id="table-container"></div>
+      <div id="pagination-container"></div>
+    </div>
+    <div id="entry-modal-wrap"></div>
+    <div id="import-modal-wrap"></div>
+  </template>
+
+  <script src="js/config.js"></script><script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/production.js"></script>
+</body>
+</html>

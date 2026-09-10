@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Public Site CMS | DEV Fly Ash Bricks ERP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/splash.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body class="bg-surface-50 dark:bg-surface-950 text-surface-800 dark:text-surface-200 min-h-screen">
+  <div id="layout-wrapper"></div>
+
+  <!-- Main Content Template -->
+  <template id="page-template">
+    <div class="flex flex-col gap-6 max-w-7xl mx-auto">
+      
+      <!-- Top Action Bar -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🌐</span>
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight text-surface-900 dark:text-surface-100">Public Site Control (CMS)</h1>
+          </div>
+          <p class="text-surface-500 dark:text-surface-400 mt-1 text-sm">
+            Complete administrative control to update articles, gallery photos, company details, and monitor customer order enquiries.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <a href="index.html" target="_blank" class="flex-1 md:flex-none px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2">
+            <span>↗</span> Open Live Public Site
+          </a>
+        </div>
+      </div>
+
+      <!-- CMS Tabs -->
+      <div class="flex border-b border-surface-200 dark:border-surface-800 gap-2 overflow-x-auto pb-1">
+        <button onclick="switchCmsTab('articles')" id="tab-btn-articles" class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 bg-brand-600 text-white shadow-sm">
+          <span>📰</span> Articles & Vlogs
+        </button>
+        <button onclick="switchCmsTab('leadership')" id="tab-btn-leadership" class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-surface-500 hover:text-surface-200 hover:bg-surface-800">
+          <span>👥</span> Leadership & Hero
+        </button>
+        <button onclick="switchCmsTab('gallery')" id="tab-btn-gallery" class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-surface-500 hover:text-surface-200 hover:bg-surface-800">
+          <span>🖼️</span> Gallery Photos
+        </button>
+        <button onclick="switchCmsTab('enquiries')" id="tab-btn-enquiries" class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-surface-500 hover:text-surface-200 hover:bg-surface-800">
+          <span>📥</span> Enquiries Inbox
+          <span id="enquiry-badge" class="ml-1 px-2 py-0.5 text-xs bg-brand-500 text-white rounded-full hidden">0</span>
+        </button>
+        <button onclick="switchCmsTab('settings')" id="tab-btn-settings" class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-surface-500 hover:text-surface-200 hover:bg-surface-800">
+          <span>⚙️</span> Site Content & Info
+        </button>
+        <button onclick="switchCmsTab('preview')" id="tab-btn-preview" class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 text-surface-500 hover:text-surface-200 hover:bg-surface-800">
+          <span>📱</span> Duplicate Live Preview
+        </button>
+      </div>
+
+      <!-- TAB 1: ARTICLES & VLOGS -->
+      <div id="tab-content-articles" class="flex flex-col gap-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold">Articles & Manufacturing Vlogs</h2>
+            <p class="text-xs text-surface-400">Published on <code>/manufacture.html</code> for clients and builders.</p>
+          </div>
+          <button onclick="openArticleModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-bold transition-colors">
+            + New Article
+          </button>
+        </div>
+        <div id="articles-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Rendered by JS -->
+          <div class="p-8 text-center text-surface-400 bg-surface-900/40 rounded-2xl border border-surface-800 col-span-2">
+            Loading articles...
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: LEADERSHIP & HERO (NEW) -->
+      <div id="tab-content-leadership" class="flex flex-col gap-6 hidden">
+        <form id="leadership-form" class="flex flex-col gap-6">
+
+          <!-- Hero Settings -->
+          <div class="bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+            <h2 class="text-xl font-bold mb-4">🏗️ Hero Banner &amp; Factory Stats</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Hero Badge Text</label>
+                <input type="text" id="ldr-hero-badge" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="Trusted Manufacturer Since 2020">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Hero Subtitle / Description</label>
+                <textarea id="ldr-hero-subtitle" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm h-20">Premium eco-friendly fly ash bricks crafted with precision and passion.</textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Hero / Factory Image Path</label>
+                <input type="text" id="ldr-hero-image" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="assets/plant-real.jpg">
+                <p class="text-xs text-surface-500 mt-1">Path relative to frontend folder (e.g. assets/plant-real.jpg)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dev Kumar Dansena -->
+          <div class="bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <img id="prev-dev-photo" src="http://127.0.0.1:3000/assets/dev-dansena.jpg" onerror="this.src='assets/dev-dansena.jpg'" class="w-14 h-14 rounded-full object-cover border-2 border-brand-500">
+              <div>
+                <h2 class="text-xl font-bold">👤 Dev Kumar Dansena (Founder &amp; Owner)</h2>
+                <p class="text-xs text-surface-400">Updates reflected on home, about, and gallery pages</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Name</label>
+                <input type="text" id="ldr-dev-name" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="Dev Kumar Dansena">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Role / Title</label>
+                <input type="text" id="ldr-dev-role" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="Founder &amp; Owner · BDC">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Phone</label>
+                <input type="text" id="ldr-dev-phone" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="8085112711">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Badge / Tag</label>
+                <input type="text" id="ldr-dev-badge" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="BDC · ब्लॉक विकास समिति">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Location / Address</label>
+                <input type="text" id="ldr-dev-location" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="W5JV+P4H, Sondka, Basanpali, Kharsia, Raigarh, CG 496661">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Photo Path</label>
+                <input type="text" id="ldr-dev-photo" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="assets/dev-dansena.jpg" oninput="document.getElementById('prev-dev-photo').src=this.value">
+              </div>
+            </div>
+          </div>
+
+          <!-- Ashish Dansena -->
+          <div class="bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <img id="prev-ash-photo" src="http://127.0.0.1:3000/assets/ashish-dansena.jpg" onerror="this.src='assets/ashish-dansena.jpg'" class="w-14 h-14 rounded-full object-cover border-2 border-brand-500">
+              <div>
+                <h2 class="text-xl font-bold">👤 Ashish Dansena (Director &amp; Operations)</h2>
+                <p class="text-xs text-surface-400">Updates reflected on home and about pages</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Name</label>
+                <input type="text" id="ldr-ash-name" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="Ashish Dansena">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Role / Title</label>
+                <input type="text" id="ldr-ash-role" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="Director &amp; Operations Manager">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Phone</label>
+                <input type="text" id="ldr-ash-phone" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="8085112711">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Badge / Tag</label>
+                <input type="text" id="ldr-ash-badge" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="Operations &amp; Management">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Location / Address</label>
+                <input type="text" id="ldr-ash-location" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="W5JV+P4H, Sondka, Basanpali, Kharsia, Raigarh, CG 496661">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Photo Path</label>
+                <input type="text" id="ldr-ash-photo" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="assets/ashish-dansena.jpg" oninput="document.getElementById('prev-ash-photo').src=this.value">
+              </div>
+            </div>
+          </div>
+
+          <!-- Family Centre Photo -->
+          <div class="bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+            <h2 class="text-xl font-bold mb-4">👨‍👩‍👦 Family Centre Photo &amp; Google Rating</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Family Photo Path</label>
+                <input type="text" id="ldr-fam-photo" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="assets/family.jpg">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Family Caption Title</label>
+                <input type="text" id="ldr-fam-title" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="The Dansena Family">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Family Section Subtitle</label>
+                <textarea id="ldr-fam-subtitle" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm h-16">The heart and soul behind DEV Fly Ash Bricks — a family committed to quality, community, and building Chhattisgarh.</textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Google Rating Link (full URL)</label>
+                <input type="text" id="ldr-fam-rating-link" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="https://maps.google.com/?cid=12428886325267991234">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Google Rating Text</label>
+                <input type="text" id="ldr-fam-rating-text" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="📍 dev fly ash bricks (⭐ 5.0) ↗">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="submit" class="px-8 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm shadow-md transition-colors">
+              💾 Save Leadership &amp; Hero Settings
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 2: GALLERY PHOTOS -->
+      <div id="tab-content-gallery" class="flex flex-col gap-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold">Photo Gallery Management</h2>
+            <p class="text-xs text-surface-400">Manage plant, brick stacks, and fleet photos visible on <code>/gallery.html</code>.</p>
+          </div>
+          <button onclick="openGalleryModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-bold transition-colors">
+            + Add Photo
+          </button>
+        </div>
+        <div id="gallery-items-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- TAB 3: ENQUIRIES INBOX -->
+      <div id="tab-content-enquiries" class="flex flex-col gap-6 hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold">Customer Order Enquiries</h2>
+            <p class="text-xs text-surface-400">Orders submitted via public site enquiry form. Dispatched to <code>ashishdansena636@gmail.com</code> with attached XML.</p>
+          </div>
+          <button onclick="loadEnquiries()" class="px-4 py-2 bg-surface-800 hover:bg-surface-700 text-surface-200 rounded-xl text-sm font-bold transition-colors">
+            🔄 Refresh
+          </button>
+        </div>
+        <div class="bg-white dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-surface-100 dark:bg-surface-800/60 text-surface-400 uppercase text-xs">
+                <tr>
+                  <th class="p-4">Customer</th>
+                  <th class="p-4">Phone / WhatsApp</th>
+                  <th class="p-4">Category</th>
+                  <th class="p-4">Quantity</th>
+                  <th class="p-4">Date</th>
+                  <th class="p-4">XML Query</th>
+                </tr>
+              </thead>
+              <tbody id="enquiries-table-body" class="divide-y divide-surface-200 dark:divide-surface-800">
+                <tr>
+                  <td colspan="6" class="p-6 text-center text-surface-400">Loading enquiries...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SITE SETTINGS & INFO -->
+      <div id="tab-content-settings" class="flex flex-col gap-6 hidden">
+        <div class="bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+          <h2 class="text-xl font-bold mb-4">Public Site Information & Contact Settings</h2>
+          <form id="public-settings-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Company / Brand Name</label>
+              <input type="text" id="cfg-company-name" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="DEV Fly Ash Bricks" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Primary Phone Number</label>
+              <input type="text" id="cfg-phone" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="8085112711" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Enquiry Receiver Email (Ashish Dansena)</label>
+              <input type="email" id="cfg-owner-email" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="ashishdansena636@gmail.com" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Contact Email (Public)</label>
+              <input type="email" id="cfg-email" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="info@devbricks.in" required>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Factory Address (Sondka, Kharsia)</label>
+              <input type="text" id="cfg-address" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="W5JV+P4H, Sondka, Basanpali, Kharsia, Raigarh, Chhattisgarh 496661, India" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Google Maps CID Link</label>
+              <input type="text" id="cfg-maps-cid" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="12428886325267991234">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-surface-400 mb-1">WhatsApp URL</label>
+              <input type="text" id="cfg-wa-url" class="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-300 dark:border-surface-700 text-sm font-semibold" value="https://wa.me/918085112711">
+            </div>
+            <div class="md:col-span-2 flex justify-end mt-2">
+              <button type="submit" class="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm shadow-md transition-colors">
+                Save Settings
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 5: DUPLICATE LIVE PREVIEW -->
+      <div id="tab-content-preview" class="flex flex-col gap-4 hidden">
+        <div class="flex justify-between items-center bg-white dark:bg-surface-900 p-4 rounded-xl border border-surface-200 dark:border-surface-800">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-bold uppercase tracking-wider text-surface-400">Live Preview:</span>
+            <span class="text-sm font-mono text-brand-400">http://127.0.0.1:3000/index.html</span>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="document.getElementById('live-preview-frame').src='index.html'" class="px-3 py-1 bg-surface-800 hover:bg-surface-700 rounded-lg text-xs font-bold text-surface-300">Home</button>
+            <button onclick="document.getElementById('live-preview-frame').src='about.html'" class="px-3 py-1 bg-surface-800 hover:bg-surface-700 rounded-lg text-xs font-bold text-surface-300">About</button>
+            <button onclick="document.getElementById('live-preview-frame').src='gallery.html'" class="px-3 py-1 bg-surface-800 hover:bg-surface-700 rounded-lg text-xs font-bold text-surface-300">Gallery</button>
+            <button onclick="document.getElementById('live-preview-frame').src='manufacture.html'" class="px-3 py-1 bg-surface-800 hover:bg-surface-700 rounded-lg text-xs font-bold text-surface-300">Articles</button>
+            <button onclick="document.getElementById('live-preview-frame').src='contact.html'" class="px-3 py-1 bg-surface-800 hover:bg-surface-700 rounded-lg text-xs font-bold text-surface-300">Contact</button>
+          </div>
+        </div>
+        <div class="w-full bg-surface-950 rounded-2xl border-2 border-surface-700 overflow-hidden shadow-2xl" style="height:720px;">
+          <iframe id="live-preview-frame" src="index.html" class="w-full h-full border-0"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </template>
+
+  <!-- MODAL: ADD/EDIT ARTICLE -->
+  <div id="article-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface-900 border border-surface-700 rounded-2xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="article-modal-title" class="text-lg font-bold">Add New Article</h3>
+        <button onclick="closeArticleModal()" class="text-surface-400 hover:text-white text-xl">✕</button>
+      </div>
+      <form id="article-form" class="flex flex-col gap-4">
+        <input type="hidden" id="art-id">
+        <div>
+          <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Article Title</label>
+          <input type="text" id="art-title" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm font-semibold" required placeholder="e.g. Curing Techniques for Maximum Brick Strength">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Category</label>
+            <input type="text" id="art-category" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm" value="Manufacturing">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Read Time</label>
+            <input type="text" id="art-readtime" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm" value="5 min read">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Short Excerpt (Summary)</label>
+          <textarea id="art-excerpt" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm h-20" required placeholder="A brief preview of the article..."></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Full Content / Article Text</label>
+          <textarea id="art-content" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm h-32" placeholder="Full article body content..."></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Image URL / Path</label>
+          <input type="text" id="art-image" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm" value="assets/gallery-2.jpg">
+        </div>
+        <div class="flex justify-end gap-2 mt-2">
+          <button type="button" onclick="closeArticleModal()" class="px-4 py-2 rounded-xl bg-surface-800 text-surface-300 font-bold text-sm">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm">Save Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD GALLERY PHOTO -->
+  <div id="gallery-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface-900 border border-surface-700 rounded-2xl p-6 max-w-md w-full">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold">Add Photo to Gallery</h3>
+        <button onclick="closeGalleryModal()" class="text-surface-400 hover:text-white text-xl">✕</button>
+      </div>
+      <form id="gallery-item-form" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Photo Title / Caption</label>
+          <input type="text" id="gal-title" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm font-semibold" required placeholder="e.g. Hydraulic Press Line in Operation">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Category</label>
+          <select id="gal-category" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm font-semibold">
+            <option value="plant">Manufacturing Plant</option>
+            <option value="bricks">Bricks & Products</option>
+            <option value="delivery">Fleet & Delivery</option>
+            <option value="team">Leadership & Team</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Image Path / URL</label>
+          <input type="text" id="gal-image" class="w-full p-3 rounded-xl bg-surface-950 border border-surface-700 text-sm font-semibold" value="assets/gallery-1.jpg" required placeholder="assets/your-image.jpg">
+        </div>
+        <div class="flex justify-end gap-2 mt-2">
+          <button type="button" onclick="closeGalleryModal()" class="px-4 py-2 rounded-xl bg-surface-800 text-surface-300 font-bold text-sm">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm">Add to Gallery</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/public-site-cms.js"></script>
+</body>
+</html>

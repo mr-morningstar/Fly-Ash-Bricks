@@ -7,8 +7,10 @@ on:
 
 jobs:
   build-apk:
-    name: Build Debug APK
+    name: Build & Release APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # needed to create GitHub Releases
 
     steps:
       - name: Checkout repository
@@ -34,7 +36,6 @@ jobs:
         run: |
           SOURCE="frontend/assets/app-icon.jpg"
 
-          # Android icon sizes per density
           declare -A SIZES=(
             ["mipmap-mdpi"]=48
             ["mipmap-hdpi"]=72
@@ -46,12 +47,10 @@ jobs:
           for DENSITY in "${!SIZES[@]}"; do
             SIZE=${SIZES[$DENSITY]}
             DIR="capacitor-app/android/app/src/main/res/$DENSITY"
-            echo "Resizing to ${SIZE}x${SIZE} → $DENSITY"
             convert "$SOURCE" -resize "${SIZE}x${SIZE}" "$DIR/ic_launcher.png"
             convert "$SOURCE" -resize "${SIZE}x${SIZE}" "$DIR/ic_launcher_round.png"
             convert "$SOURCE" -resize "${SIZE}x${SIZE}" "$DIR/ic_launcher_foreground.png"
           done
-
           echo "✅ All icons applied!"
 
       - name: Install Capacitor dependencies
@@ -70,14 +69,47 @@ jobs:
         working-directory: capacitor-app/android
         run: ./gradlew assembleDebug --no-daemon
 
+      - name: Rename APK
+        run: |
+          cp capacitor-app/android/app/build/outputs/apk/debug/app-debug.apk \
+             DEV-FlyAshBricks.apk
+          echo "✅ APK ready: DEV-FlyAshBricks.apk"
+          ls -lh DEV-FlyAshBricks.apk
+
+      # Upload as artifact (always available in Actions tab)
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: DEV-FlyAshBricks-APK
-          path: capacitor-app/android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+          path: DEV-FlyAshBricks.apk
+          retention-days: 90
 
-      - name: Build summary
+      # Create/update GitHub Release so website download button works
+      - name: Delete existing latest release (if any)
         run: |
-          echo "✅ APK built with DEV Fly Ash Bricks icon!"
-          ls -lh capacitor-app/android/app/build/outputs/apk/debug/
+          gh release delete latest --yes 2>/dev/null || true
+          git push --delete origin latest 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "DEV Fly Ash Bricks — Latest APK"
+          body: |
+            ## 📱 DEV Fly Ash Bricks — Android App
+
+            **Auto-built from latest code** on ${{ github.event.head_commit.timestamp }}
+
+            ### How to Install:
+            1. Download `DEV-FlyAshBricks.apk` below
+            2. On your phone: Settings → Install unknown apps → Allow
+            3. Tap the downloaded file to install
+
+            ---
+            *Built with ❤️ by Shivam Dansena · DEV Fly Ash Bricks ERP*
+          files: DEV-FlyAshBricks.apk
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

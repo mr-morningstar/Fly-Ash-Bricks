@@ -255,12 +255,17 @@ function buildPasswordResetHtml({ name, resetUrl }) {
 </html>`;
 }
 
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 /**
  * Configure Nodemailer Transporter (exact GYM platform pattern)
  */
-function getTransporter() {
+function getTransporter(portOverride) {
   const isSecure = process.env.SMTP_SECURE === 'true' || Number(process.env.SMTP_PORT) === 465;
-  const portNum = Number(process.env.SMTP_PORT) || 587;
+  const portNum = portOverride || Number(process.env.SMTP_PORT) || 587;
   const host = process.env.SMTP_HOST || (process.env.EMAIL_USER?.includes('@gmail.com') ? 'smtp.gmail.com' : 'smtp-relay.brevo.com');
   const user = process.env.SMTP_USER || process.env.EMAIL_USER;
   const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
@@ -272,8 +277,9 @@ function getTransporter() {
       return nodemailer.createTransport({
         service: 'gmail',
         auth: { user, pass },
-        connectionTimeout: 10000,
-        socketTimeout: 45000
+        family: 4,
+        connectionTimeout: 15000,
+        socketTimeout: 30000
       });
     }
     return nodemailer.createTransport({
@@ -281,8 +287,12 @@ function getTransporter() {
       port: portNum,
       secure: isSecure,
       auth: { user, pass },
-      connectionTimeout: 10000,
-      socketTimeout: 45000
+      family: 4,
+      connectionTimeout: 15000,
+      socketTimeout: 30000,
+      tls: {
+        rejectUnauthorized: false
+      }
     });
   }
 

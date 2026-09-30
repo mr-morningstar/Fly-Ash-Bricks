@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build-apk:
@@ -11,18 +11,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout source code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Java 17 (required for modern Android builds)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Setup Node.js for Capacitor sync
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -30,37 +27,57 @@ jobs:
           cache: 'npm'
           cache-dependency-path: capacitor-app/package-lock.json
 
-      # 4. Install Capacitor dependencies
+      - name: Install ImageMagick (for icon resizing)
+        run: sudo apt-get install -y imagemagick
+
+      - name: Resize and apply app icon to all mipmap densities
+        run: |
+          SOURCE="frontend/assets/app-icon.jpg"
+
+          # Android icon sizes per density
+          declare -A SIZES=(
+            ["mipmap-mdpi"]=48
+            ["mipmap-hdpi"]=72
+            ["mipmap-xhdpi"]=96
+            ["mipmap-xxhdpi"]=144
+            ["mipmap-xxxhdpi"]=192
+          )
+
+          for DENSITY in "${!SIZES[@]}"; do
+            SIZE=${SIZES[$DENSITY]}
+            DIR="capacitor-app/android/app/src/main/res/$DENSITY"
+            echo "Resizing to ${SIZE}x${SIZE} → $DENSITY"
+            convert "$SOURCE" -resize "${SIZE}x${SIZE}" "$DIR/ic_launcher.png"
+            convert "$SOURCE" -resize "${SIZE}x${SIZE}" "$DIR/ic_launcher_round.png"
+            convert "$SOURCE" -resize "${SIZE}x${SIZE}" "$DIR/ic_launcher_foreground.png"
+          done
+
+          echo "✅ All icons applied!"
+
       - name: Install Capacitor dependencies
         working-directory: capacitor-app
         run: npm ci
 
-      # 5. Sync web assets into Android project
       - name: Sync Capacitor Android
         working-directory: capacitor-app
         run: npx cap sync android
 
-      # 6. Grant Gradle execute permission
       - name: Make gradlew executable
         working-directory: capacitor-app/android
         run: chmod +x gradlew
 
-      # 7. Build debug APK
       - name: Build Debug APK
         working-directory: capacitor-app/android
         run: ./gradlew assembleDebug --no-daemon
 
-      # 8. Upload APK as downloadable artifact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DEV-FlyAshBricks-debug-APK
+          name: DEV-FlyAshBricks-APK
           path: capacitor-app/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      # 9. Show build result
-      - name: Build complete
+      - name: Build summary
         run: |
-          echo "✅ APK built successfully!"
-          echo "📱 Download from: Actions tab → This workflow run → Artifacts"
+          echo "✅ APK built with DEV Fly Ash Bricks icon!"
           ls -lh capacitor-app/android/app/build/outputs/apk/debug/

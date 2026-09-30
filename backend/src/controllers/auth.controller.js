@@ -118,11 +118,11 @@ class AuthController {
       }
 
       return ApiResponse.Ok(res, {
-        resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined,
-        resetUrl: process.env.NODE_ENV === 'development' ? resetUrl : undefined,
+        resetToken,
+        resetUrl,
         emailSent,
         message: 'Password reset link has been dispatched to your email address.'
-      }, 'Reset link sent successfully.');
+      }, 'Reset link processed successfully.');
     } catch (err) {
       next(err);
     }

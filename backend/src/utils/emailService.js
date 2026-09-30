@@ -256,24 +256,33 @@ function buildPasswordResetHtml({ name, resetUrl }) {
 }
 
 /**
- * Configure Nodemailer Transporter (fallback)
+ * Configure Nodemailer Transporter (exact GYM platform pattern)
  */
 function getTransporter() {
+  const isSecure = process.env.SMTP_SECURE === 'true' || Number(process.env.SMTP_PORT) === 465;
+  const portNum = Number(process.env.SMTP_PORT) || 587;
+  const host = process.env.SMTP_HOST || (process.env.EMAIL_USER?.includes('@gmail.com') ? 'smtp.gmail.com' : 'smtp-relay.brevo.com');
   const user = process.env.SMTP_USER || process.env.EMAIL_USER;
   const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
 
+  logger.info(`[emailService] Initializing transporter | Host: ${host} | Port: ${portNum} | Secure: ${isSecure} | User: ${user ? '✅ set' : '❌ missing'}`);
+
   if (user && pass) {
-    if (user.includes('@gmail.com')) {
+    if (user.includes('@gmail.com') || host.includes('gmail.com')) {
       return nodemailer.createTransport({
         service: 'gmail',
-        auth: { user, pass }
+        auth: { user, pass },
+        connectionTimeout: 10000,
+        socketTimeout: 45000
       });
     }
     return nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: Number(process.env.SMTP_PORT) === 465,
-      auth: { user, pass }
+      host,
+      port: portNum,
+      secure: isSecure,
+      auth: { user, pass },
+      connectionTimeout: 10000,
+      socketTimeout: 45000
     });
   }
 
@@ -285,65 +294,75 @@ function getTransporter() {
 }
 
 /**
- * Universal email dispatcher: Uses Brevo HTTPS REST API when available (bypassing SMTP port limits),
- * otherwise falls back to standard Nodemailer transport.
+ * Universal email dispatcher matching GYM platform:
+ * Attempts Brevo HTTPS REST API first; if unconfigured or rejected (e.g. 401 unactivated key),
+ * automatically and transparently falls back to SMTP transport.
  */
 async function sendEmailUniversal({ to, subject, html, attachments = [] }) {
   const fromName = process.env.FROM_NAME || 'DEV Fly Ash Bricks';
-  const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'ashishdansena636@gmail.com';
+  const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'sworkdansena@gmail.com';
   const brevoKey = process.env.BREVO_API_KEY || (process.env.SMTP_PASS && process.env.SMTP_PASS.startsWith('xkeysib-') ? process.env.SMTP_PASS : null);
   const isBrevoHost = process.env.SMTP_HOST && process.env.SMTP_HOST.includes('brevo.com');
 
+  // 1. Try Brevo HTTPS REST API
   if (brevoKey || (isBrevoHost && process.env.SMTP_PASS)) {
-    const apiKey = brevoKey || process.env.SMTP_PASS;
-    logger.info(`[emailService] Sending email via Brevo HTTPS REST API to: ${to}`);
+    try {
+      const apiKey = brevoKey || process.env.SMTP_PASS;
+      logger.info(`[emailService] Attempting Brevo HTTPS REST API dispatch to: ${to}`);
 
-    const payload = {
-      sender: { name: fromName, email: fromEmail },
-      to: [{ email: to }],
-      subject,
-      htmlContent: html
-    };
+      const payload = {
+        sender: { name: fromName, email: fromEmail },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html
+      };
 
-    if (attachments && attachments.length > 0) {
-      payload.attachment = attachments.map(att => ({
-        name: att.filename,
-        content: Buffer.isBuffer(att.content) ? att.content.toString('base64') : Buffer.from(att.content).toString('base64')
-      }));
+      if (attachments && attachments.length > 0) {
+        payload.attachment = attachments.map(att => ({
+          name: att.filename,
+          content: Buffer.isBuffer(att.content) ? att.content.toString('base64') : Buffer.from(att.content).toString('base64')
+        }));
+      }
+
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': apiKey,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        logger.warn(`[emailService] Brevo HTTP API returned status ${res.status} (${errText}). Falling back to SMTP transport.`);
+      } else {
+        const data = await res.json();
+        logger.info(`[emailService] Brevo HTTP API successfully delivered messageId: ${data.messageId}`);
+        return { success: true, messageId: data.messageId };
+      }
+    } catch (apiErr) {
+      logger.warn(`[emailService] Brevo HTTP API attempt failed (${apiErr.message}). Proceeding with SMTP fallback...`);
     }
-
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'api-key': apiKey,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      logger.error(`[emailService] Brevo API Error (${res.status}): ${errText}`);
-      throw new Error(`Brevo Email Error: ${errText}`);
-    }
-
-    const data = await res.json();
-    logger.info(`[emailService] Brevo successfully delivered messageId: ${data.messageId}`);
-    return { success: true, messageId: data.messageId };
   }
 
-  // Fallback to standard nodemailer SMTP
-  const transporter = getTransporter();
-  const info = await transporter.sendMail({
-    from: `"${fromName}" <${fromEmail}>`,
-    to,
-    subject,
-    html,
-    attachments
-  });
-  logger.info(`[emailService] Sent via SMTP transport: ${info.messageId}`);
-  return { success: true, messageId: info.messageId };
+  // 2. Standard Nodemailer SMTP fallback (exact GYM platform pattern)
+  try {
+    const transporter = getTransporter();
+    const info = await transporter.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to,
+      subject,
+      html,
+      attachments
+    });
+    logger.info(`[emailService] Message successfully dispatched via SMTP: ${info.messageId || 'OK'}`);
+    return { success: true, messageId: info.messageId };
+  } catch (smtpErr) {
+    logger.error(`[emailService] SMTP fallback failed:`, smtpErr.message);
+    throw smtpErr;
+  }
 }
 
 /**

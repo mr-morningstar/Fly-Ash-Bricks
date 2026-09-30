@@ -43,9 +43,9 @@ const seed = async () => {
     }
 
     // 3. Seed initial Super Admin User
-    const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@devbricks.com';
+    const adminEmail = process.env.SEED_ADMIN_EMAIL || 'ashishdansena636@gmail.com';
     const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'Admin@123';
-    const adminName = process.env.SEED_ADMIN_NAME || 'Super Admin';
+    const adminName = process.env.SEED_ADMIN_NAME || 'Dev Kumar Dansena';
 
     let adminUser = await UserModel.findOne({ email: adminEmail });
     if (!adminUser) {
@@ -55,7 +55,7 @@ const seed = async () => {
         email: adminEmail,
         password: adminPassword,
         role: rolesMap['Super Admin']._id,
-        phone: '9999999999',
+        phone: '8085112711',
         isActive: true,
         theme: 'dark',
         publicSlug: 'super-admin'

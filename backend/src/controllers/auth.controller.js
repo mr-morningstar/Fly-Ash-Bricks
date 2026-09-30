@@ -49,9 +49,6 @@ class AuthController {
     try {
       const { email, password } = req.body;
       let normalizedEmail = (email || '').trim().toLowerCase();
-      if (normalizedEmail === 'admin@devbricks.in') {
-        normalizedEmail = 'admin@devbricks.com';
-      }
 
       const user = await UserModel.findOne({ email: normalizedEmail }).select('+password').populate('role');
       if (!user || !user.isActive) {

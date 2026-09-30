@@ -4,16 +4,16 @@
   "webDir": "../frontend",
   "android": {
     "backgroundColor": "#0f172a",
-    "allowMixedContent": true
+    "allowMixedContent": false
   },
   "server": {
-    "url": "http://192.168.29.16:3000",
-    "cleartext": true,
-    "androidScheme": "http"
+    "url": "https://fly-ash-bricks.vercel.app",
+    "cleartext": false,
+    "androidScheme": "https"
   },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 2000,
+      "launchShowDuration": 2500,
       "launchAutoHide": true,
       "backgroundColor": "#0f172a",
       "androidSplashResourceName": "splash",

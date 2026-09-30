@@ -232,7 +232,10 @@ function buildPasswordResetHtml({ name, resetUrl }) {
     <div class="footer">
       <strong>DEV Fly Ash Bricks</strong> · Dev Kumar Dansena & Ashish Dansena<br>
       📍 Sondka, Basanpali, Kharsia, Raigarh, Chhattisgarh 496661 · Call: +91 80851 12711<br>
-      &copy; ${year} DEV Fly Ash Bricks. All rights reserved.
+      &copy; ${year} DEV Fly Ash Bricks. All rights reserved.<br>
+      <span style="font-size:10px;color:#374151;margin-top:8px;display:block;">
+        Digitally crafted by <strong style="color:#2dd4bf;">Shivam Dansena</strong> &mdash; Full Stack Developer &amp; Systems Designer
+      </span>
     </div>
   </div>
 </body>
@@ -274,7 +277,7 @@ function getTransporter() {
  */
 async function sendEmailUniversal({ to, subject, html, attachments = [] }) {
   const fromName = process.env.FROM_NAME || 'DEV Fly Ash Bricks';
-  const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'sworkdansena@gmail.com';
+  const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'ashishdansena636@gmail.com';
   const brevoKey = process.env.BREVO_API_KEY || (process.env.SMTP_PASS && process.env.SMTP_PASS.startsWith('xkeysib-') ? process.env.SMTP_PASS : null);
   const isBrevoHost = process.env.SMTP_HOST && process.env.SMTP_HOST.includes('brevo.com');
 

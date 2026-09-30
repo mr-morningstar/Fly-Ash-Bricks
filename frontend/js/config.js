@@ -8,7 +8,7 @@
 // Production backend on Render (Default service name: flyashbricks-backend)
 // Update this URL if your Render backend service has a different domain name:
 const PROD_API_URL       = 'https://flyashbricks-backend.onrender.com/api';
-const CAPACITOR_API_URL  = 'http://192.168.29.16:5000/api'; // Your PC's WiFi IP for local Android testing
+const CAPACITOR_API_URL  = 'https://flyashbricks-backend.onrender.com/api'; // Production Render backend
 
 const isCapacitor = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const isLocal     = ['localhost', '127.0.0.1'].includes(window.location.hostname);

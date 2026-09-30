@@ -70,6 +70,46 @@ const SettingsModule = {
     } catch (err) {
       showToast(err.message, 'error');
     }
+  },
+
+  async changePassword(e) {
+    e.preventDefault();
+    const currentPassword = document.getElementById('s-cur-password').value;
+    const newPassword = document.getElementById('s-new-password').value;
+    const confirmPassword = document.getElementById('s-confirm-password').value;
+    const btn = document.getElementById('s-change-pwd-btn');
+
+    if (newPassword.length < 6) {
+      showToast('New password must be at least 6 characters.', 'warning');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showToast('New passwords do not match.', 'error');
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      showToast('New password cannot be the same as your current password.', 'warning');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Updating...';
+
+    try {
+      await apiFetch('/auth/change-password', {
+        method: 'PUT',
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      showToast('Password updated successfully!', 'success');
+      document.getElementById('settings-password-form').reset();
+    } catch (err) {
+      showToast(err.message || 'Failed to update password. Check current password.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔑 Update Password';
+    }
   }
 };
 

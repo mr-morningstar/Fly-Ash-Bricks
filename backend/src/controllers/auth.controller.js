@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const { UserModel } = require('../models/User.model');
 const { ApiResponse } = require('../core/responses/ApiResponse');
 const { AppError } = require('../utils/appError');
+const { sendPasswordResetEmail } = require('../utils/emailService');
+const { logger } = require('../core/logger/winston.logger');
 const crypto = require('crypto');
 
 /** Generate JWT Token */
@@ -86,7 +88,7 @@ class AuthController {
     }
   };
 
-  /** Forgot Password */
+  /** Forgot Password — sends branded email via Brevo HTTP API */
   forgotPassword = async (req, res, next) => {
     try {
       const { email } = req.body;
@@ -98,15 +100,32 @@ class AuthController {
       const resetToken = user.createPasswordResetToken();
       await user.save({ validateBeforeSave: false });
 
-      // In real prod we'd send an email. For DEV, we'll return the token in the API response 
-      // so it's easy to reset password from local/Postman/frontend without setting up SMTP.
-      const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${resetToken}`;
+      // Determine client frontend URL
+      const frontendBase = (process.env.CLIENT_URL && process.env.CLIENT_URL !== '*')
+        ? process.env.CLIENT_URL.replace(/\/$/, '')
+        : (req.headers.origin || `${req.protocol}://${req.get('host')}`);
+
+      const resetUrl = `${frontendBase}/reset-password.html?token=${resetToken}`;
+
+      let emailSent = false;
+      try {
+        await sendPasswordResetEmail({
+          to: user.email,
+          name: user.name,
+          resetUrl
+        });
+        emailSent = true;
+        logger.info(`✅ Password reset email successfully delivered to ${user.email}`);
+      } catch (mailErr) {
+        logger.error(`❌ Could not send reset email to ${user.email}:`, mailErr);
+      }
 
       return ApiResponse.Ok(res, {
-        resetToken,
-        resetUrl,
-        message: 'Password reset link generated (sent in response for convenience).'
-      }, 'Token generated successfully.');
+        resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined,
+        resetUrl: process.env.NODE_ENV === 'development' ? resetUrl : undefined,
+        emailSent,
+        message: 'Password reset link has been dispatched to your email address.'
+      }, 'Reset link sent successfully.');
     } catch (err) {
       next(err);
     }
@@ -132,6 +151,34 @@ class AuthController {
       await user.save();
 
       return createSendToken(user, 200, res, 'Password reset successfully. You are now logged in.');
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  /** Change Password (for currently authenticated user) */
+  changePassword = async (req, res, next) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const user = await UserModel.findById(req.user.id).select('+password');
+
+      if (!user) {
+        return next(new AppError('User account not found.', 404));
+      }
+
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return next(new AppError('Current password is incorrect.', 400));
+      }
+
+      if (currentPassword === newPassword) {
+        return next(new AppError('New password cannot be the same as your current password.', 400));
+      }
+
+      user.password = newPassword;
+      await user.save();
+
+      return ApiResponse.Ok(res, null, 'Password updated successfully!');
     } catch (err) {
       next(err);
     }

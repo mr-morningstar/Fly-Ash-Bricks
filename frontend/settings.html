@@ -103,6 +103,34 @@
           </div>
         </form>
       </div>
+
+      <!-- Security & Password Management -->
+      <div class="bg-white dark:bg-surface-900 rounded-2xl p-6 border border-surface-200 dark:border-surface-800 shadow-sm">
+        <h2 class="font-black text-lg mb-2 flex items-center gap-2">🔒 Security & Password</h2>
+        <p class="text-xs text-surface-500 dark:text-surface-400 mb-6">Update your account password to keep your ERP workspace secure.</p>
+        
+        <form id="settings-password-form" onsubmit="SettingsModule.changePassword(event)" class="flex flex-col gap-4 max-w-xl">
+          <div>
+            <label class="block text-xs font-bold text-surface-500 mb-1">Current Password</label>
+            <input type="password" name="currentPassword" id="s-cur-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-surface-500 mb-1">New Password (min 6 chars)</label>
+              <input type="password" name="newPassword" id="s-new-password" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-surface-500 mb-1">Confirm New Password</label>
+              <input type="password" name="confirmPassword" id="s-confirm-password" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-700 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+          </div>
+          <div class="flex justify-start pt-2">
+            <button type="submit" id="s-change-pwd-btn" class="px-6 py-2.5 bg-surface-800 hover:bg-brand-600 text-white border border-surface-700 hover:border-brand-500 rounded-xl font-bold text-sm transition-all shadow-md">
+              🔑 Update Password
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </template>
 

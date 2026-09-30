@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Forgot password handler
   forgotBtn?.addEventListener('click', async (e) => {
     e.preventDefault();
-    const email = prompt('Enter your registered email address:');
+    const email = prompt('Enter your registered email address to receive a password reset link:');
     if (!email) return;
 
     if (loader) loader.style.display = 'flex';
@@ -84,12 +84,21 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await apiFetch('/auth/forgot-password', {
         method: 'POST',
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email: email.trim() })
       });
 
-      alert(`Password reset link generated:\n\n${res.data?.resetUrl || 'Check server console'}\n\nUse this link to set a new password.`);
+      if (res.data?.resetUrl) {
+        // In local development or testing
+        const openNow = confirm(`✅ Password reset link generated!\n\nEmail sent to: ${email.trim()}\n\nWould you like to open the reset page right now?`);
+        if (openNow) {
+          window.location.href = res.data.resetUrl;
+          return;
+        }
+      } else {
+        alert(`✅ Password reset email dispatched to ${email.trim()}!\n\nPlease check your inbox (and spam folder) for instructions to reset your password.`);
+      }
     } catch (error) {
-      alert(error.message || 'Failed to generate reset link.');
+      alert(error.message || 'Failed to send password reset email. Please ensure your email is correct.');
     } finally {
       if (loader) loader.style.display = 'none';
     }

@@ -9,7 +9,8 @@ const { validate } = require('../core/middlewares/validate.middleware');
 const {
   loginValidation,
   forgotPasswordValidation,
-  resetPasswordValidation
+  resetPasswordValidation,
+  changePasswordValidation
 } = require('../validations/auth.validation');
 
 router.post('/login', authLimiter, loginValidation, validate, authController.login);
@@ -17,7 +18,8 @@ router.post('/logout', authController.logout);
 router.post('/forgot-password', forgotPasswordValidation, validate, authController.forgotPassword);
 router.put('/reset-password/:token', resetPasswordValidation, validate, authController.resetPassword);
 
-// Authenticated route
+// Authenticated routes
 router.get('/me', verifyToken, authController.getMe);
+router.put('/change-password', verifyToken, changePasswordValidation, validate, authController.changePassword);
 
 module.exports = router;

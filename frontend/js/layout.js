@@ -103,7 +103,8 @@ function renderLayout() {
           <span class="brand-by-line">by Shivam Dansena</span>
         </div>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <button onclick="window.openChangePasswordModal()" class="p-2 text-surface-400 hover:text-brand-400 focus:outline-none text-base" title="Change Password">🔑</button>
         <button id="theme-toggle-mobile" class="p-2 text-surface-400 hover:text-surface-200 focus:outline-none">🌓</button>
         <button id="menu-toggle" class="p-2 text-surface-400 hover:text-surface-200 focus:outline-none text-xl">☰</button>
       </div>
@@ -137,9 +138,14 @@ function renderLayout() {
             <span class="text-xs text-brand-500 capitalize font-semibold">${user.role?.name || 'Staff'}</span>
           </div>
         </div>
-        <div class="flex justify-between items-center pt-2 gap-2">
-          <button id="theme-toggle" class="flex-1 py-2 text-surface-400 hover:text-surface-200 hover:bg-white/5 rounded-lg text-sm transition-colors">🌓 Theme</button>
-          <button id="logout-btn" class="flex-1 py-2 text-rose-400 hover:text-rose-300 hover:bg-white/5 rounded-lg text-sm transition-colors">🚪 Logout</button>
+        <div class="flex flex-col gap-1.5 pt-1">
+          <button onclick="window.openChangePasswordModal()" class="w-full py-1.5 px-3 text-surface-300 hover:text-brand-300 hover:bg-white/5 border border-white/5 hover:border-brand-500/30 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5">
+            <span>🔑</span> Change Password
+          </button>
+          <div class="flex justify-between items-center gap-2">
+            <button id="theme-toggle" class="flex-1 py-1.5 text-surface-400 hover:text-surface-200 hover:bg-white/5 rounded-lg text-xs transition-colors">🌓 Theme</button>
+            <button id="logout-btn" class="flex-1 py-1.5 text-rose-400 hover:text-rose-300 hover:bg-white/5 rounded-lg text-xs transition-colors">🚪 Logout</button>
+          </div>
         </div>
       </div>
     </aside>
@@ -152,11 +158,14 @@ function renderLayout() {
       <!-- Desktop Header -->
       <header class="hidden md:flex justify-between items-center px-8 py-4 bg-white/80 dark:bg-surface-950/90 backdrop-blur-md border-b border-surface-200 dark:border-white/5 sticky top-0 z-30">
         <h2 id="page-title" class="font-black text-2xl tracking-tight text-surface-800 dark:text-surface-100"></h2>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
           <span class="text-sm font-semibold text-surface-500 dark:text-surface-400 bg-surface-100 dark:bg-brand-900/30 border border-brand-500/20 px-3 py-1.5 rounded-full flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
             Dev Village Mold Yard
           </span>
+          <button onclick="window.openChangePasswordModal()" class="flex items-center gap-1.5 text-xs font-bold text-surface-300 hover:text-white bg-surface-100 dark:bg-surface-800/80 hover:bg-brand-600/30 border border-surface-200 dark:border-surface-700 hover:border-brand-500/50 px-3 py-1.5 rounded-full transition-all" title="Change your password">
+            🔑 Change Password
+          </button>
         </div>
       </header>
       
@@ -170,6 +179,57 @@ function renderLayout() {
     <nav id="bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 border-t border-white/5 z-40 flex justify-around items-end pt-1 pb-safe backdrop-blur-lg" style="background:rgba(9,20,25,0.97);">
       ${bottomNavHtml}
     </nav>
+
+    <!-- Global Change Password Modal -->
+    <div id="change-password-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all">
+      <div class="bg-surface-900 border border-brand-500/30 rounded-2xl p-6 md:p-8 w-full max-w-md shadow-2xl text-surface-200 relative">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-lg">🔑</div>
+            <h3 class="font-black text-lg text-white">Change Password</h3>
+          </div>
+          <button onclick="window.closeChangePasswordModal()" class="text-surface-400 hover:text-white text-xl leading-none">&times;</button>
+        </div>
+
+        <div id="modal-pwd-error" class="hidden mb-4 p-3 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs rounded-xl"></div>
+        <div id="modal-pwd-success" class="hidden mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs rounded-xl"></div>
+
+        <form id="modal-change-pwd-form" onsubmit="window.handleModalChangePassword(event)" class="flex flex-col gap-4">
+          <div>
+            <label class="block text-xs font-bold text-surface-400 mb-1">Current Password</label>
+            <div class="relative flex items-center">
+              <input type="password" id="modal-cur-pwd" required class="w-full px-3 py-2.5 bg-surface-950 border border-surface-700 focus:border-brand-500 rounded-xl text-sm outline-none text-white pr-10">
+              <button type="button" onclick="window.toggleModalPass('modal-cur-pwd', this)" class="absolute right-3 text-surface-400 hover:text-brand-400">👁️</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-surface-400 mb-1">New Password (min 6 characters)</label>
+            <div class="relative flex items-center">
+              <input type="password" id="modal-new-pwd" required minlength="6" class="w-full px-3 py-2.5 bg-surface-950 border border-surface-700 focus:border-brand-500 rounded-xl text-sm outline-none text-white pr-10">
+              <button type="button" onclick="window.toggleModalPass('modal-new-pwd', this)" class="absolute right-3 text-surface-400 hover:text-brand-400">👁️</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-surface-400 mb-1">Confirm New Password</label>
+            <div class="relative flex items-center">
+              <input type="password" id="modal-confirm-pwd" required minlength="6" class="w-full px-3 py-2.5 bg-surface-950 border border-surface-700 focus:border-brand-500 rounded-xl text-sm outline-none text-white pr-10">
+              <button type="button" onclick="window.toggleModalPass('modal-confirm-pwd', this)" class="absolute right-3 text-surface-400 hover:text-brand-400">👁️</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 pt-3 border-t border-white/10 mt-2">
+            <button type="button" onclick="window.closeChangePasswordModal()" class="px-4 py-2 text-xs font-bold text-surface-400 hover:text-white rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button type="submit" id="modal-pwd-submit-btn" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-black shadow-lg shadow-brand-500/30 transition-all flex items-center gap-2">
+              Update Password →
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   `;
 
   // Dynamic set page title
@@ -237,3 +297,88 @@ function setupLayoutEvents() {
     });
   }
 }
+
+// ── Change Password Modal Functions ─────────────────────────────────────────
+
+window.openChangePasswordModal = function() {
+  const modal = document.getElementById('change-password-modal');
+  const err = document.getElementById('modal-pwd-error');
+  const succ = document.getElementById('modal-pwd-success');
+  const form = document.getElementById('modal-change-pwd-form');
+  if (err) { err.textContent = ''; err.classList.add('hidden'); }
+  if (succ) { succ.textContent = ''; succ.classList.add('hidden'); }
+  if (form) form.reset();
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeChangePasswordModal = function() {
+  const modal = document.getElementById('change-password-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.toggleModalPass = function(id, btn) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+  }
+};
+
+window.handleModalChangePassword = async function(e) {
+  e.preventDefault();
+  const currentPassword = document.getElementById('modal-cur-pwd').value;
+  const newPassword = document.getElementById('modal-new-pwd').value;
+  const confirmPassword = document.getElementById('modal-confirm-pwd').value;
+  const errDiv = document.getElementById('modal-pwd-error');
+  const succDiv = document.getElementById('modal-pwd-success');
+  const btn = document.getElementById('modal-pwd-submit-btn');
+
+  errDiv.classList.add('hidden');
+  succDiv.classList.add('hidden');
+
+  if (newPassword.length < 6) {
+    errDiv.textContent = 'New password must be at least 6 characters.';
+    errDiv.classList.remove('hidden');
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    errDiv.textContent = 'New passwords do not match. Please verify.';
+    errDiv.classList.remove('hidden');
+    return;
+  }
+
+  if (currentPassword === newPassword) {
+    errDiv.textContent = 'New password cannot be the same as your current password.';
+    errDiv.classList.remove('hidden');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  try {
+    await apiFetch('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+
+    succDiv.textContent = '✅ Password updated successfully!';
+    succDiv.classList.remove('hidden');
+    if (typeof showToast === 'function') showToast('Password updated successfully!', 'success');
+
+    setTimeout(() => {
+      window.closeChangePasswordModal();
+    }, 1500);
+  } catch (err) {
+    errDiv.textContent = err.message || 'Failed to update password. Check your current password.';
+    errDiv.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Update Password →';
+  }
+};

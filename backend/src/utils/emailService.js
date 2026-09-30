@@ -172,34 +172,173 @@ function buildCustomerEmailHtml(enquiry) {
 }
 
 /**
- * Configure Nodemailer Transporter
+ * Builds HTML template for Password Reset (DEV Fly Ash Bricks)
+ */
+function buildPasswordResetHtml({ name, resetUrl }) {
+  const userName = name || 'Valued Team Member';
+  const year = new Date().getFullYear();
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #080f14; margin: 0; padding: 24px; color: #e6edf3; }
+    .wrapper { max-width: 580px; margin: 0 auto; background: #0e171f; border-radius: 20px; border: 1px solid #1e2c38; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+    .header { background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #064e3b 100%); padding: 32px 24px; text-align: center; color: #ffffff; }
+    .brand-title { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
+    .brand-sub { margin: 6px 0 0; font-size: 13px; color: #a7f3d0; font-weight: 500; letter-spacing: 0.5px; }
+    .body { padding: 36px 28px; }
+    .headline { font-size: 20px; font-weight: 800; color: #f0fdfa; margin: 0 0 16px; }
+    .text { font-size: 15px; color: #94a3b8; line-height: 1.65; margin: 0 0 20px; }
+    .notice-box { background: rgba(13, 148, 136, 0.1); border-left: 4px solid #14b8a6; padding: 14px 18px; border-radius: 8px; margin: 24px 0; }
+    .btn-container { text-align: center; margin: 32px 0; }
+    .reset-btn { display: inline-block; background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); color: #ffffff !important; padding: 15px 36px; border-radius: 12px; font-size: 15px; font-weight: 800; text-decoration: none; box-shadow: 0 10px 25px rgba(20, 184, 166, 0.35); text-transform: uppercase; letter-spacing: 0.8px; }
+    .footer { background: #070d12; padding: 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #17232d; }
+    .footer a { color: #14b8a6; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <div style="font-size:32px;margin-bottom:8px;">🧱</div>
+      <h1 class="brand-title">DEV FLY ASH BRICKS</h1>
+      <p class="brand-sub">Management & Manufacturing ERP · Sondka, Kharsia</p>
+    </div>
+    <div class="body">
+      <h2 class="headline">Password Reset Request 🔐</h2>
+      <p class="text">Hello <strong>${userName}</strong>,</p>
+      <p class="text">
+        We received a request to reset the password for your account on the <strong>DEV Fly Ash Bricks ERP</strong> workspace. 
+        Click the secure button below to set a new password:
+      </p>
+
+      <div class="btn-container">
+        <a href="${resetUrl}" class="reset-btn" target="_blank">Reset My Password →</a>
+      </div>
+
+      <div class="notice-box">
+        <p style="margin:0;font-size:13px;color:#cbd5e1;line-height:1.5;">
+          ⏱️ <strong>Security Notice:</strong> This reset link is single-use and will expire in <strong>15 minutes</strong>. If you did not request this change, please ignore this email; your existing password will remain safe.
+        </p>
+      </div>
+
+      <p class="text" style="font-size:13px;color:#64748b;margin-top:24px;">
+        If the button above does not work, copy and paste this URL into your browser:<br>
+        <span style="color:#2dd4bf;word-break:break-all;">${resetUrl}</span>
+      </p>
+    </div>
+    <div class="footer">
+      <strong>DEV Fly Ash Bricks</strong> · Dev Kumar Dansena & Ashish Dansena<br>
+      📍 Sondka, Basanpali, Kharsia, Raigarh, Chhattisgarh 496661 · Call: +91 80851 12711<br>
+      &copy; ${year} DEV Fly Ash Bricks. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Configure Nodemailer Transporter (fallback)
  */
 function getTransporter() {
   const user = process.env.SMTP_USER || process.env.EMAIL_USER;
   const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
 
   if (user && pass) {
-    // If Gmail
     if (user.includes('@gmail.com')) {
       return nodemailer.createTransport({
         service: 'gmail',
         auth: { user, pass }
       });
     }
-    // Custom SMTP
     return nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
       port: Number(process.env.SMTP_PORT) || 587,
       secure: Number(process.env.SMTP_PORT) === 465,
       auth: { user, pass }
     });
   }
 
-  // Fallback test/stream transport if SMTP is not yet configured in .env
   return nodemailer.createTransport({
     streamTransport: true,
     newline: 'windows',
     buffer: true
+  });
+}
+
+/**
+ * Universal email dispatcher: Uses Brevo HTTPS REST API when available (bypassing SMTP port limits),
+ * otherwise falls back to standard Nodemailer transport.
+ */
+async function sendEmailUniversal({ to, subject, html, attachments = [] }) {
+  const fromName = process.env.FROM_NAME || 'DEV Fly Ash Bricks';
+  const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'sworkdansena@gmail.com';
+  const brevoKey = process.env.BREVO_API_KEY || (process.env.SMTP_PASS && process.env.SMTP_PASS.startsWith('xkeysib-') ? process.env.SMTP_PASS : null);
+  const isBrevoHost = process.env.SMTP_HOST && process.env.SMTP_HOST.includes('brevo.com');
+
+  if (brevoKey || (isBrevoHost && process.env.SMTP_PASS)) {
+    const apiKey = brevoKey || process.env.SMTP_PASS;
+    logger.info(`[emailService] Sending email via Brevo HTTPS REST API to: ${to}`);
+
+    const payload = {
+      sender: { name: fromName, email: fromEmail },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html
+    };
+
+    if (attachments && attachments.length > 0) {
+      payload.attachment = attachments.map(att => ({
+        name: att.filename,
+        content: Buffer.isBuffer(att.content) ? att.content.toString('base64') : Buffer.from(att.content).toString('base64')
+      }));
+    }
+
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      logger.error(`[emailService] Brevo API Error (${res.status}): ${errText}`);
+      throw new Error(`Brevo Email Error: ${errText}`);
+    }
+
+    const data = await res.json();
+    logger.info(`[emailService] Brevo successfully delivered messageId: ${data.messageId}`);
+    return { success: true, messageId: data.messageId };
+  }
+
+  // Fallback to standard nodemailer SMTP
+  const transporter = getTransporter();
+  const info = await transporter.sendMail({
+    from: `"${fromName}" <${fromEmail}>`,
+    to,
+    subject,
+    html,
+    attachments
+  });
+  logger.info(`[emailService] Sent via SMTP transport: ${info.messageId}`);
+  return { success: true, messageId: info.messageId };
+}
+
+/**
+ * Sends Password Reset Email via Brevo / SMTP
+ */
+async function sendPasswordResetEmail({ to, name, resetUrl }) {
+  const html = buildPasswordResetHtml({ name, resetUrl });
+  return sendEmailUniversal({
+    to,
+    subject: '🔑 Reset Your Password — DEV Fly Ash Bricks ERP',
+    html
   });
 }
 
@@ -210,25 +349,21 @@ function getTransporter() {
 async function sendOrderEnquiryEmails(enquiry) {
   const targetOwnerEmail = process.env.OWNER_EMAIL || 'ashishdansena636@gmail.com';
   const xmlContent = generateEnquiryXml(enquiry);
-  const transporter = getTransporter();
-
-  const ownerMailOptions = {
-    from: process.env.EMAIL_FROM || `"DEV Fly Ash Bricks" <no-reply@devbricks.in>`,
-    to: targetOwnerEmail,
-    subject: `🧱 New Brick Order Enquiry from ${enquiry.firstName} ${enquiry.lastName || ''} (${enquiry.phone})`,
-    html: buildOwnerEmailHtml(enquiry),
-    attachments: [
-      {
-        filename: `enquiry-${enquiry._id || 'details'}.xml`,
-        content: xmlContent,
-        contentType: 'application/xml'
-      }
-    ]
-  };
 
   let ownerResult;
   try {
-    ownerResult = await transporter.sendMail(ownerMailOptions);
+    ownerResult = await sendEmailUniversal({
+      to: targetOwnerEmail,
+      subject: `🧱 New Brick Order Enquiry from ${enquiry.firstName} ${enquiry.lastName || ''} (${enquiry.phone})`,
+      html: buildOwnerEmailHtml(enquiry),
+      attachments: [
+        {
+          filename: `enquiry-${enquiry._id || 'details'}.xml`,
+          content: xmlContent,
+          contentType: 'application/xml'
+        }
+      ]
+    });
     logger.info(`✅ Enquiry email dispatched to owner (${targetOwnerEmail}) for customer ${enquiry.phone}`);
   } catch (err) {
     logger.error('Error sending owner enquiry email:', err);
@@ -237,8 +372,7 @@ async function sendOrderEnquiryEmails(enquiry) {
   // Send confirmation to customer if they provided an email address
   if (enquiry.email && enquiry.email.includes('@')) {
     try {
-      await transporter.sendMail({
-        from: process.env.EMAIL_FROM || `"DEV Fly Ash Bricks" <info@devbricks.in>`,
+      await sendEmailUniversal({
         to: enquiry.email,
         subject: `Enquiry Received: DEV Fly Ash Bricks`,
         html: buildCustomerEmailHtml(enquiry)
@@ -257,5 +391,8 @@ async function sendOrderEnquiryEmails(enquiry) {
 
 module.exports = {
   generateEnquiryXml,
-  sendOrderEnquiryEmails
+  sendOrderEnquiryEmails,
+  sendEmailUniversal,
+  sendPasswordResetEmail,
+  buildPasswordResetHtml
 };

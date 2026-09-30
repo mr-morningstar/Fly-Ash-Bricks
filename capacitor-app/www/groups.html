@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groups | DEV Fly Ash Bricks</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-surface-50 dark:bg-surface-950 text-surface-800 dark:text-surface-200 min-h-screen">
+
+  <div id="layout-wrapper">
+    <!-- Automatically populated by layout.js -->
+  </div>
+
+  <!-- Page template -->
+  <template id="page-template">
+    <div class="flex flex-col gap-6">
+      
+      <!-- Group Listing Cards & Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+        <div>
+          <h3 class="font-extrabold text-lg text-surface-900 dark:text-white">Mold Groups</h3>
+          <p class="text-xs text-surface-500 font-bold mt-1">Manage brick molding worker cohorts</p>
+        </div>
+        <button id="create-group-btn" 
+                class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-brand-600/25 active:scale-95 transition-all">
+          ➕ New Group
+        </button>
+      </div>
+
+      <!-- Groups Grid -->
+      <div id="groups-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Dynamically populated group cards -->
+      </div>
+
+      <!-- Group Detail Panel (hidden until a card is selected) -->
+      <div id="group-detail-panel" class="hidden flex flex-col gap-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+          <div>
+            <h4 id="detail-group-title" class="font-black text-xl text-surface-950 dark:text-white">Group A</h4>
+            <p id="detail-group-desc" class="text-xs text-surface-500 font-bold mt-1">Details and member list</p>
+          </div>
+          <div class="flex gap-2 w-full md:w-auto">
+            <button id="group-settings-btn" class="flex-1 md:flex-none px-4 py-2 border border-surface-200 dark:border-surface-800 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-xl text-sm font-bold transition-all">⚙️ Settings</button>
+            <button id="assign-member-btn" class="flex-1 md:flex-none px-4 py-2 bg-brand-600 hover:bg-brand-505 text-white rounded-xl text-sm font-bold transition-all">➕ Assign Labours</button>
+          </div>
+        </div>
+
+        <!-- Members Table -->
+        <div class="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-2xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-50 dark:bg-surface-950 border-b border-surface-200 dark:border-surface-800 text-xs font-extrabold uppercase tracking-wider text-surface-400">
+                  <th class="px-6 py-4">Name</th>
+                  <th class="px-6 py-4">Phone</th>
+                  <th class="px-6 py-4">Advance</th>
+                  <th class="px-6 py-4">Attendance Strip (Last 7 Days)</th>
+                  <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="members-table-body" class="divide-y divide-surface-100 dark:divide-surface-800 text-sm">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rate/Settings Configuration Modal -->
+      <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="w-full max-w-md rounded-2xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 p-6 md:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+          <button id="close-settings-modal" class="absolute top-4 right-4 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200">✕</button>
+          
+          <h3 class="font-extrabold text-xl mb-6 text-surface-900 dark:text-white">Group Rate settings</h3>
+          
+          <form id="group-settings-form" class="flex flex-col gap-4">
+            <input type="hidden" id="settings-group-id">
+
+            <div>
+              <label for="form-rate-brick" class="block text-xs font-bold uppercase text-surface-400 mb-1">Rate Per Brick (₹) *</label>
+              <input type="number" id="form-rate-brick" required min="0" step="any"
+                     class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-sm font-medium">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="form-split-method" class="block text-xs font-bold uppercase text-surface-400 mb-1">Split Method *</label>
+                <select id="form-split-method" required
+                        class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-sm font-medium">
+                  <option value="equal">Equal Share</option>
+                  <option value="fixed">Fixed Per-Head</option>
+                </select>
+              </div>
+              <div>
+                <label for="form-fixed-rate" class="block text-xs font-bold uppercase text-surface-400 mb-1">Fixed Rate Per-Head (₹)</label>
+                <input type="number" id="form-fixed-rate" min="0" step="any" placeholder="0.00"
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-sm font-medium">
+              </div>
+            </div>
+
+            <!-- Attendance Multipliers Section -->
+            <div class="border-t border-surface-200 dark:border-surface-800 pt-4">
+              <h5 class="text-xs font-bold uppercase tracking-wider text-surface-400 mb-3">Attendance Multipliers</h5>
+              <div class="grid grid-cols-4 gap-2">
+                <div>
+                  <label for="mult-p" class="block text-[10px] font-bold text-center text-surface-500 mb-1">🟢 P</label>
+                  <input type="number" id="mult-p" step="any" min="0" required
+                         class="w-full text-center px-2 py-1.5 rounded-lg border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-xs font-bold">
+                </div>
+                <div>
+                  <label for="mult-hd" class="block text-[10px] font-bold text-center text-surface-500 mb-1">🟡 HD</label>
+                  <input type="number" id="mult-hd" step="any" min="0" required
+                         class="w-full text-center px-2 py-1.5 rounded-lg border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-xs font-bold">
+                </div>
+                <div>
+                  <label for="mult-fd" class="block text-[10px] font-bold text-center text-surface-500 mb-1">🔵 FD</label>
+                  <input type="number" id="mult-fd" step="any" min="0" required
+                         class="w-full text-center px-2 py-1.5 rounded-lg border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-xs font-bold">
+                </div>
+                <div>
+                  <label for="mult-a" class="block text-[10px] font-bold text-center text-surface-500 mb-1">🔴 A</label>
+                  <input type="number" id="mult-a" step="any" min="0" required
+                         class="w-full text-center px-2 py-1.5 rounded-lg border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-xs font-bold">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit"
+                    class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-brand-600/20 transition-all mt-2 active:scale-95">
+              Save Rate Configuration
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Assign Member Modal -->
+      <div id="assign-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="w-full max-w-md rounded-2xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 p-6 md:p-8 shadow-2xl relative">
+          <button id="close-assign-modal" class="absolute top-4 right-4 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200">✕</button>
+          <h3 class="font-extrabold text-xl mb-6 text-surface-900 dark:text-white">Assign Labours to Group</h3>
+          
+          <div class="flex flex-col gap-4">
+            <p class="text-xs text-surface-500 font-bold">Select unassigned labours to add to this group:</p>
+            <div id="unassigned-list" class="max-h-60 overflow-y-auto border border-surface-200 dark:border-surface-800 rounded-xl divide-y divide-surface-100 dark:divide-surface-800">
+              <!-- Dynamically populated checkbox list -->
+            </div>
+            <button id="confirm-assign-btn" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm transition-all active:scale-95">
+              Confirm Assignment
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create Group Modal -->
+      <div id="create-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="w-full max-w-md rounded-2xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 p-6 shadow-2xl relative">
+          <button id="close-create-modal" class="absolute top-4 right-4 text-surface-400">✕</button>
+          <h3 class="font-extrabold text-xl mb-4 text-surface-900 dark:text-white">Create New Group</h3>
+          <form id="create-group-form" class="flex flex-col gap-4">
+            <div>
+              <label for="create-name" class="block text-xs font-bold uppercase text-surface-400 mb-1">Group Name *</label>
+              <input type="text" id="create-name" required placeholder="e.g. Group C"
+                     class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none">
+            </div>
+            <div>
+              <label for="create-desc" class="block text-xs font-bold uppercase text-surface-400 mb-1">Description</label>
+              <input type="text" id="create-desc" placeholder="e.g. Shift 1 Molding team"
+                     class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="create-max" class="block text-xs font-bold uppercase text-surface-400 mb-1">Max Members</label>
+                <input type="number" id="create-max" value="20" min="1" required
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none">
+              </div>
+              <div>
+                <label for="create-rate" class="block text-xs font-bold uppercase text-surface-400 mb-1">Rate Per Brick (₹) *</label>
+                <input type="number" id="create-rate" value="5.50" step="any" min="0" required
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none">
+              </div>
+            </div>
+            <button type="submit" class="w-full py-3 bg-brand-600 text-white font-bold rounded-xl active:scale-95 transition-all">Create Group</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </template>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/splash.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/groups.js"></script>
+</body>
+</html>

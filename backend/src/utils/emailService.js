@@ -126,7 +126,11 @@ function buildOwnerEmailHtml(enquiry) {
     </div>
     <div class="footer">
       DEV Fly Ash Bricks · Sondka, Basanpali, Kharsia, Raigarh, CG · Phone: 8085112711<br>
-      System Architect: Shivam Dansena
+      <div style="margin-top:14px;padding:12px;background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.25);border-radius:10px;">
+        <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#ff8c37;font-weight:700;display:block;">Enterprise ERP Architecture</span>
+        <span style="font-size:13px;color:#ffffff;font-weight:800;">Digitally Developed &amp; Designed by <strong style="color:#ff8c37;">Shivam Dansena</strong></span>
+        <div style="font-size:11px;color:#8b949e;margin-top:2px;">Full-Stack Developer &amp; Systems Designer</div>
+      </div>
     </div>
   </div>
 </body>
@@ -147,7 +151,7 @@ function buildCustomerEmailHtml(enquiry) {
     .container { max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e1e4e8; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
     .header { background: #ff6b00; padding: 24px; text-align: center; color: #ffffff; }
     .body { padding: 28px; line-height: 1.6; }
-    .footer { background: #fafbfc; padding: 14px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #eee; }
+    .footer { background: #fafbfc; padding: 16px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #eee; }
   </style>
 </head>
 <body>
@@ -164,7 +168,10 @@ function buildCustomerEmailHtml(enquiry) {
       <p style="margin-top:24px;">Warm regards,<br><strong>Dev Kumar Dansena & Ashish Dansena</strong><br>DEV Fly Ash Bricks · Sondka, Kharsia, Raigarh (CG)</p>
     </div>
     <div class="footer">
-      📍 W5JV+P4H, Sondka, Basanpali, Chhattisgarh 496661 · Call: +91 80851 12711
+      📍 W5JV+P4H, Sondka, Basanpali, Chhattisgarh 496661 · Call: +91 80851 12711<br>
+      <div style="margin-top:10px;padding:10px;background:#f0fdfa;border:1px solid #ccfbf1;border-radius:8px;display:inline-block;">
+        <span style="font-size:11px;color:#0f766e;font-weight:700;">Crafted with excellence by <strong>Shivam Dansena</strong> &mdash; Full Stack Developer</span>
+      </div>
     </div>
   </div>
 </body>
@@ -196,7 +203,10 @@ function buildPasswordResetHtml({ name, resetUrl }) {
     .btn-container { text-align: center; margin: 32px 0; }
     .reset-btn { display: inline-block; background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); color: #ffffff !important; padding: 15px 36px; border-radius: 12px; font-size: 15px; font-weight: 800; text-decoration: none; box-shadow: 0 10px 25px rgba(20, 184, 166, 0.35); text-transform: uppercase; letter-spacing: 0.8px; }
     .footer { background: #070d12; padding: 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #17232d; }
-    .footer a { color: #14b8a6; text-decoration: none; }
+    .dev-stamp { margin-top: 18px; padding: 14px; background: rgba(13, 148, 136, 0.08); border: 1px solid rgba(13, 148, 136, 0.25); border-radius: 12px; text-align: center; }
+    .dev-title { font-size: 10px; font-weight: 800; color: #14b8a6; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
+    .dev-name { font-size: 14px; font-weight: 800; color: #ffffff; }
+    .dev-role { font-size: 11px; color: #94a3b8; margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -232,10 +242,13 @@ function buildPasswordResetHtml({ name, resetUrl }) {
     <div class="footer">
       <strong>DEV Fly Ash Bricks</strong> · Dev Kumar Dansena & Ashish Dansena<br>
       📍 Sondka, Basanpali, Kharsia, Raigarh, Chhattisgarh 496661 · Call: +91 80851 12711<br>
-      &copy; ${year} DEV Fly Ash Bricks. All rights reserved.<br>
-      <span style="font-size:10px;color:#374151;margin-top:8px;display:block;">
-        Digitally crafted by <strong style="color:#2dd4bf;">Shivam Dansena</strong> &mdash; Full Stack Developer &amp; Systems Designer
-      </span>
+      &copy; ${year} DEV Fly Ash Bricks. All rights reserved.
+      
+      <div class="dev-stamp">
+        <div class="dev-title">Digital ERP Solutions Architecture</div>
+        <div class="dev-name">Crafted by <span style="color:#2dd4bf;">Shivam Dansena</span></div>
+        <div class="dev-role">Full-Stack Software Developer &amp; Lead Systems Architect</div>
+      </div>
     </div>
   </div>
 </body>

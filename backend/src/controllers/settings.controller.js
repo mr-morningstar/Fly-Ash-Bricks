@@ -95,22 +95,40 @@ class SettingsController {
   /** Update Role (protect default/Super Admin) */
   updateRole = async (req, res, next) => {
     try {
-      const { permissions, description } = req.body;
+      const { name, permissions, description } = req.body;
       const role = await RoleModel.findById(req.params.id);
       if (!role) {
         return next(new AppError('Role not found.', 404));
       }
 
-      if (!role.isEditable) {
-        return next(new AppError('The Super Admin role configuration is locked and cannot be edited.', 403));
+      if (role.name === 'Super Admin' && name && name !== 'Super Admin') {
+        return next(new AppError('The Super Admin role name cannot be renamed.', 403));
       }
 
-      if (permissions) role.permissions = permissions;
-      if (description) role.description = description;
+      if (name && name !== role.name) {
+        const existing = await RoleModel.findOne({ name, _id: { $ne: role._id } });
+        if (existing) {
+          return next(new AppError('A role with this name already exists.', 400));
+        }
+        role.name = name;
+      }
+
+      if (permissions && Array.isArray(permissions)) {
+        // Super Admin must retain all permissions
+        if (role.name === 'Super Admin') {
+          // keep Super Admin permissions intact
+        } else {
+          role.permissions = permissions;
+        }
+      }
+
+      if (description !== undefined) {
+        role.description = description;
+      }
 
       await role.save();
 
-      return ApiResponse.Ok(res, role, 'Role permissions updated successfully.');
+      return ApiResponse.Ok(res, role, 'Role details updated successfully.');
     } catch (err) {
       next(err);
     }

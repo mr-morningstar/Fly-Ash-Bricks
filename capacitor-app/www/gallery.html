@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery | DEV Fly Ash Bricks — Shivam Dansena</title>
+  <meta name="description" content="Browse our gallery of premium fly ash bricks, manufacturing facility, and completed construction projects by DEV Fly Ash Bricks.">
+  <link rel="stylesheet" href="public.css">
+  <style>
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:36px; }
+    .filter-btn {
+      padding:8px 18px; border-radius:50px; font-size:13px; font-weight:600;
+      border:1px solid var(--border); background:transparent; color:var(--text-secondary);
+      cursor:pointer; transition:var(--transition);
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background:var(--orange); border-color:var(--orange); color:#fff;
+    }
+    .gallery-placeholder {
+      width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+      flex-direction:column; gap:10px; color:var(--text-muted);
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+    }
+    .gallery-placeholder span { font-size:40px; }
+    .gallery-placeholder p { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo-icon">DEV</div>
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">DEV Fly Ash Bricks</span>
+        <span class="nav-brand-sub">Dev Kumar Dansena</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+      <li><a href="about.html" data-i18n="nav.about">About</a></li>
+      <li><a href="gallery.html" class="active" data-i18n="nav.gallery">Gallery</a></li>
+      <li><a href="manufacture.html" data-i18n="nav.manufacture">Manufacture</a></li>
+      <li><a href="offers.html" data-i18n="nav.offers">Offers</a></li>
+      <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
+      <li><button id="lang-toggle" class="lang-btn" onclick="toggleLanguage()">हिंदी</button></li>
+      <li><a href="login.html" class="nav-cta" data-i18n="nav.login">Login →</a></li>
+    </ul>
+    <div class="nav-toggle" id="nav-toggle"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="page-hero">
+    <div class="hero-bg-grid"></div>
+    <div style="position:relative;z-index:1;">
+      <span class="section-tag" data-i18n="gallery.tag">Portfolio</span>
+      <h1 class="section-title" style="font-size:clamp(32px,5vw,60px);margin-top:12px;"><span data-i18n="gallery.title">Visual Gallery</span></h1>
+      <p style="color:var(--text-secondary);font-size:16px;max-width:520px;margin:16px auto 0;line-height:1.7;" data-i18n="gallery.desc">
+        Explore our high-compression automated plant, brick inventory stacks, fleet delivery, and family leadership.
+      </p>
+    </div>
+  </div>
+
+  <section class="section" style="padding-top:40px;">
+    <div class="section-container">
+
+      <!-- Filter Bar -->
+      <div class="filter-bar reveal">
+        <button class="filter-btn active" id="filter-all" onclick="filterGallery('all',this)" data-i18n="filter.all">All Photos</button>
+        <button class="filter-btn" onclick="filterGallery('factory',this)" data-i18n="filter.plant">Manufacturing Plant</button>
+        <button class="filter-btn" onclick="filterGallery('bricks',this)" data-i18n="filter.bricks">Bricks & Products</button>
+        <button class="filter-btn" onclick="filterGallery('delivery',this)" data-i18n="filter.fleet">Fleet & Delivery</button>
+        <button class="filter-btn" onclick="filterGallery('team',this)" data-i18n="filter.team">Leadership & Team</button>
+      </div>
+
+      <!-- Main Gallery Grid -->
+      <div class="gallery-grid reveal" id="gallery-grid">
+
+        <!-- Item 1: Leadership Photo -->
+        <div class="gallery-item reveal" data-cat="team">
+          <img src="assets/family.jpg" alt="Dev Kumar Dansena & Ashish Dansena" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          <div class="gallery-overlay">
+            <div class="gallery-info">
+              <span class="gallery-cat">Leadership & Management</span>
+              <h4 class="gallery-title">Dev Kumar Dansena (Owner) & Ashish Dansena (Director)</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="gallery-item" data-cat="bricks">
+          <img src="assets/gallery-1.jpg" alt="Premium Fly Ash Bricks Stack">
+          <div class="gallery-overlay">
+            <div class="gallery-overlay-text">Premium Fly Ash Bricks</div>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="gallery-item reveal" data-cat="factory">
+          <img src="assets/plant-real.jpg" alt="Shri Krishna Hydraulic Brick Press Machine" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Shri Krishna Hydraulic Press Unit</div></div>
+        </div>
+
+        <!-- Item 4 - wide -->
+        <div class="gallery-item wide reveal" data-cat="factory">
+          <img src="assets/plant-real.jpg" alt="DEV Fly Ash Bricks — Hydraulic Press Production Floor" style="width:100%;height:100%;object-fit:cover;object-position:left center;border-radius:inherit;">
+          <div class="gallery-overlay">
+            <div class="gallery-overlay-text">Factory Floor — Shri Krishna Hydraulic Press in Operation</div>
+          </div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="gallery-item" data-cat="bricks">
+          <div class="gallery-placeholder"><span>🧱</span><p>Brick Texture</p></div>
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Close-up Brick Texture</div></div>
+        </div>
+
+        <!-- Item 6 -->
+        <div class="gallery-item" data-cat="project">
+          <div class="gallery-placeholder"><span>🏗️</span><p>Site Work</p></div>
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Construction Site — Phase 1</div></div>
+        </div>
+
+        <!-- Item 7 -->
+        <div class="gallery-item" data-cat="project">
+          <div class="gallery-placeholder"><span>🏢</span><p>Building</p></div>
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Completed Residential Block</div></div>
+        </div>
+
+        <!-- Item 8 -->
+        <div class="gallery-item" data-cat="delivery">
+          <div class="gallery-placeholder"><span>🚛</span><p>Delivery</p></div>
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Bulk Delivery Fleet</div></div>
+        </div>
+
+        <!-- Item 9 - tall -->
+        <div class="gallery-item tall" data-cat="bricks">
+          <div class="gallery-placeholder" style="background:linear-gradient(135deg,#1a0800,#0a0a0a);">
+            <span style="font-size:60px;">🧱</span>
+            <p style="color:var(--orange);">IS 12894 Certified</p>
+          </div>
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Quality Certified Bricks</div></div>
+        </div>
+
+        <!-- Item 10 -->
+        <div class="gallery-item" data-cat="delivery">
+          <div class="gallery-placeholder"><span>📦</span><p>Packing</p></div>
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Ready for Dispatch</div></div>
+        </div>
+
+        <!-- Item 11 -->
+        <div class="gallery-item" data-cat="project">
+          <div class="gallery-placeholder"><span>🏠</span><p>House</p></div>
+          <div class="gallery-overlay"><div class="gallery-overlay-text">Completed House — Nanded</div></div>
+        </div>
+
+      </div>
+
+      <!-- Upload note -->
+      <div class="reveal" style="text-align:center;margin-top:40px;padding:32px;background:var(--bg-card);border:1px dashed var(--border);border-radius:var(--radius-lg);">
+        <p style="color:var(--text-muted);font-size:14px;">📸 More photos coming soon. <a href="contact.html" style="color:var(--orange);font-weight:700;">Send us your project photos →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="nav-brand" style="margin-bottom:14px;">
+          <div class="nav-logo-icon">DEV</div>
+          <div class="nav-brand-text">
+            <span class="nav-brand-name">DEV Fly Ash Bricks</span>
+            <span class="nav-brand-sub">Dev Kumar Dansena</span>
+          </div>
+        </div>
+        <p class="footer-brand-desc">Premium fly ash bricks manufactured with quality, precision, and sustainability at the core.</p>
+      </div>
+      <div>
+        <p class="footer-col-title">Quick Links</p>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Products</p>
+        <ul class="footer-links">
+          <li><a href="#">Standard Fly Ash Bricks</a></li>
+          <li><a href="#">Hollow Fly Ash Blocks</a></li>
+          <li><a href="#">Paving Bricks</a></li>
+          <li><a href="offers.html">Special Offers ✨</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Contact</p>
+        <ul class="footer-links">
+          <li><a href="tel:+918085112711">📞 +91 80851 12711</a></li>
+          <li><a href="mailto:info@devbricks.in">✉️ info@devbricks.in</a></li>
+          <li><a href="contact.html">📍 Sondka, Kharsia, Raigarh</a></li>
+          <li><a href="contact.html">Chhattisgarh 496661</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 <span class="footer-bottom-brand">DEV Fly Ash Bricks</span> · Dev Kumar Dansena. All rights reserved.</span>
+      <span data-i18n="footer.made">Made with ❤️ by Shivam Dansena · Developer</span>
+    </div>
+  </footer>
+
+  <script src="public.js"></script>
+  <script>
+    function filterGallery(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        const match = cat === 'all' || item.dataset.cat === cat;
+        item.style.opacity = match ? '1' : '0.2';
+        item.style.transform = match ? '' : 'scale(0.95)';
+        item.style.pointerEvents = match ? '' : 'none';
+        item.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      });
+    }
+
+    // Dynamically load custom gallery photos from CMS
+    (async function loadCmsGallery() {
+      try {
+        const res = await fetch('http://127.0.0.1:5000/api/public/site');
+        const json = await res.json();
+        const items = json?.data?.galleryItems;
+        const grid = document.getElementById('gallery-grid');
+        if (items && items.length && grid) {
+          items.forEach(it => {
+            const el = document.createElement('div');
+            el.className = 'gallery-item reveal visible';
+            el.dataset.cat = it.category || 'plant';
+            el.innerHTML = `
+              <img src="${it.image}" alt="${it.title}">
+              <div class="gallery-overlay">
+                <div class="gallery-info">
+                  <span class="gallery-cat">${it.category}</span>
+                  <h4 class="gallery-title">${it.title}</h4>
+                </div>
+              </div>
+            `;
+            grid.insertBefore(el, grid.firstChild);
+          });
+        }
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>

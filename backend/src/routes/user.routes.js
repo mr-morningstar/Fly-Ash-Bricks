@@ -21,7 +21,11 @@ router.route('/')
 router.route('/:id')
   .get(verifyToken, checkPermission('user.view'), userController.getUser)
   .put(verifyToken, checkPermission('user.edit'), uploadAvatar, userController.updateUser)
+  .patch(verifyToken, checkPermission('user.edit'), uploadAvatar, userController.updateUser)
   .delete(verifyToken, checkPermission('user.delete'), userController.deleteUser);
+
+router.patch('/:id/toggle', verifyToken, checkPermission('user.edit'), userController.toggleActive);
+router.patch('/:id/reset-password', verifyToken, checkPermission('user.edit'), userController.adminResetPassword);
 
 router.get('/:id/qr', verifyToken, checkPermission('user.view'), userController.getUserQR);
 

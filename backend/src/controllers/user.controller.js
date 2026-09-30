@@ -28,11 +28,17 @@ class UserController {
         return next(new AppError('A user with this email address already exists.', 400));
       }
 
-      // Verify Role exists
-      const role = await RoleModel.findById(data.role);
+      // Verify Role exists (support both role and roleId field names)
+      const roleIdToFind = data.role || data.roleId;
+      if (!roleIdToFind) {
+        return next(new AppError('Please select a valid role for the user.', 400));
+      }
+
+      const role = await RoleModel.findById(roleIdToFind);
       if (!role) {
         return next(new AppError('Specified Role does not exist.', 404));
       }
+      data.role = role._id;
 
       // Generate public profile slug & QR code
       data.publicSlug = generateSlug(data.name);
@@ -46,7 +52,8 @@ class UserController {
       const user = await UserModel.create(data);
       user.password = undefined;
 
-      return ApiResponse.Created(res, user, 'User created successfully with public profile QR.');
+      const createdUser = await UserModel.findById(user._id).populate('role');
+      return ApiResponse.Created(res, createdUser, 'User created successfully with public profile QR.');
     } catch (err) {
       next(err);
     }
@@ -104,11 +111,13 @@ class UserController {
         }
       }
 
-      if (data.role) {
-        const role = await RoleModel.findById(data.role);
+      const roleIdToFind = data.role || data.roleId;
+      if (roleIdToFind) {
+        const role = await RoleModel.findById(roleIdToFind);
         if (!role) {
           return next(new AppError('Specified Role does not exist.', 404));
         }
+        data.role = role._id;
       }
 
       if (req.file) {
@@ -119,14 +128,55 @@ class UserController {
         data.avatar = `uploads/avatars/${req.file.filename}`;
       }
 
-      // If password is sent, hash it via model save hook (or if direct update, it's processed on model save)
-      // Mongoose save middleware handles it, so we assign fields and call save()
       Object.assign(user, data);
       await user.save();
 
       const updated = await UserModel.findById(user._id).populate('role');
 
       return ApiResponse.Ok(res, updated, 'User details updated.');
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  /** Toggle User Active status */
+  toggleActive = async (req, res, next) => {
+    try {
+      const user = await UserModel.findById(req.params.id);
+      if (!user) {
+        return next(new AppError('User not found.', 404));
+      }
+
+      if (String(user._id) === String(req.user._id)) {
+        return next(new AppError('You cannot deactivate your own account.', 400));
+      }
+
+      user.isActive = !user.isActive;
+      await user.save();
+
+      return ApiResponse.Ok(res, { isActive: user.isActive }, `User is now ${user.isActive ? 'Active' : 'Inactive'}.`);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  /** Admin direct password reset */
+  adminResetPassword = async (req, res, next) => {
+    try {
+      const { password } = req.body;
+      if (!password || password.length < 6) {
+        return next(new AppError('Password must be at least 6 characters.', 400));
+      }
+
+      const user = await UserModel.findById(req.params.id);
+      if (!user) {
+        return next(new AppError('User not found.', 404));
+      }
+
+      user.password = password;
+      await user.save();
+
+      return ApiResponse.Ok(res, null, 'User password reset successfully.');
     } catch (err) {
       next(err);
     }

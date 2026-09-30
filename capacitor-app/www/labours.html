@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Labours | DEV Fly Ash Bricks</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-surface-50 dark:bg-surface-950 text-surface-800 dark:text-surface-200 min-h-screen">
+
+  <div id="layout-wrapper">
+    <!-- Automatically populated by layout.js -->
+  </div>
+
+  <!-- Page template -->
+  <template id="page-template">
+    <div class="flex flex-col gap-6">
+      
+      <!-- Top Filters / Header Block -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-surface-900 p-6 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
+        
+        <!-- Search and Filter Roster -->
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <!-- Search input -->
+          <div class="relative w-full md:w-72">
+            <span class="absolute left-3.5 top-3 text-surface-400">🔍</span>
+            <input type="text" id="search-input" placeholder="Search by name, phone, address..."
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 placeholder-surface-500 focus:outline-none focus:border-brand-500 text-sm font-medium">
+          </div>
+
+          <!-- Group Filter -->
+          <select id="filter-group" 
+                  class="px-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-sm font-medium">
+            <option value="">All Groups</option>
+            <!-- Dynamically populated -->
+          </select>
+
+          <!-- Status Filter -->
+          <select id="filter-status"
+                  class="px-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-sm font-medium">
+            <option value="">All Statuses</option>
+            <option value="true">Active Only</option>
+            <option value="false">Inactive Only</option>
+          </select>
+        </div>
+
+        <!-- Add Labour Button -->
+        <button id="add-btn" 
+                class="w-full md:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-brand-600/25 active:scale-95 transition-all">
+          ➕ Register Labour
+        </button>
+      </div>
+
+      <!-- Main Data Table Container -->
+      <div class="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-surface-50 dark:bg-surface-950 border-b border-surface-200 dark:border-surface-800 text-xs font-extrabold uppercase tracking-wider text-surface-400">
+                <th class="px-6 py-4">Worker info</th>
+                <th class="px-6 py-4 cursor-pointer hover:text-brand-500 transition-colors" data-sort="age">Age ↕️</th>
+                <th class="px-6 py-4">Phone</th>
+                <th class="px-6 py-4">Group</th>
+                <th class="px-6 py-4 cursor-pointer hover:text-brand-500 transition-colors" data-sort="advanceBalance">Advance Bal ↕️</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="labour-table-body" class="divide-y divide-surface-100 dark:divide-surface-800 text-sm">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden py-12 flex flex-col items-center justify-center text-surface-400">
+          <span class="text-4xl mb-3">📭</span>
+          <p class="font-bold">No labour records found matching filters.</p>
+        </div>
+
+        <!-- Table Footer / Pagination -->
+        <div class="px-6 py-4 bg-surface-50 dark:bg-surface-950 border-t border-surface-200 dark:border-surface-800 flex justify-between items-center text-xs font-bold text-surface-400">
+          <div>
+            Showing <span id="pag-start" class="text-surface-700 dark:text-surface-200">0</span> - 
+            <span id="pag-end" class="text-surface-700 dark:text-surface-200">0</span> of 
+            <span id="pag-total" class="text-surface-700 dark:text-surface-200">0</span> records
+          </div>
+          <div class="flex gap-2">
+            <button id="prev-page" class="px-3.5 py-1.5 rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 text-surface-600 dark:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 disabled:opacity-50 disabled:pointer-events-none transition-all">◀ Prev</button>
+            <button id="next-page" class="px-3.5 py-1.5 rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 text-surface-600 dark:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 disabled:opacity-50 disabled:pointer-events-none transition-all">Next ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Modal (Slide-over form overlay) -->
+      <div id="form-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="w-full max-w-lg rounded-2xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 p-6 md:p-8 shadow-2xl relative">
+          <button id="close-modal" class="absolute top-4 right-4 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 text-lg">✕</button>
+          
+          <h3 id="modal-title" class="font-extrabold text-xl mb-6 text-surface-900 dark:text-white">Register Worker Profile</h3>
+          
+          <form id="labour-form" class="flex flex-col gap-4">
+            <input type="hidden" id="labour-id">
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="form-name" class="block text-xs font-bold uppercase text-surface-400 mb-1">Full Name *</label>
+                <input type="text" id="form-name" required placeholder="e.g. Ramesh Kumar"
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 placeholder-surface-500 focus:outline-none focus:border-brand-500 text-sm font-medium">
+              </div>
+              <div>
+                <label for="form-age" class="block text-xs font-bold uppercase text-surface-400 mb-1">Age *</label>
+                <input type="number" id="form-age" required min="14" max="80" placeholder="e.g. 28"
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 placeholder-surface-500 focus:outline-none focus:border-brand-500 text-sm font-medium">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="form-phone" class="block text-xs font-bold uppercase text-surface-400 mb-1">Mobile Phone (10 digit)</label>
+                <input type="tel" id="form-phone" placeholder="e.g. 9876543210"
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 placeholder-surface-500 focus:outline-none focus:border-brand-500 text-sm font-medium">
+              </div>
+              <div>
+                <label for="form-id-proof" class="block text-xs font-bold uppercase text-surface-400 mb-1">ID Proof Number (Aadhar)</label>
+                <input type="text" id="form-id-proof" placeholder="e.g. 1234 5678 9012"
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 placeholder-surface-500 focus:outline-none focus:border-brand-500 text-sm font-medium">
+              </div>
+            </div>
+
+            <div>
+              <label for="form-address" class="block text-xs font-bold uppercase text-surface-400 mb-1">Residential Address</label>
+              <textarea id="form-address" rows="2" placeholder="Village address details..."
+                        class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 placeholder-surface-500 focus:outline-none focus:border-brand-500 text-sm font-medium"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="form-group" class="block text-xs font-bold uppercase text-surface-400 mb-1">Group Assignment</label>
+                <select id="form-group"
+                        class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-sm font-medium">
+                  <option value="">No Group</option>
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+              <div>
+                <label for="form-advance" class="block text-xs font-bold uppercase text-surface-400 mb-1">Opening Advance Bal (₹)</label>
+                <input type="number" id="form-advance" min="0" step="any" placeholder="0.00"
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 placeholder-surface-500 focus:outline-none focus:border-brand-500 text-sm font-medium">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="form-joining" class="block text-xs font-bold uppercase text-surface-400 mb-1">Joining Date</label>
+                <input type="date" id="form-joining"
+                       class="w-full px-3.5 py-2 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-100 focus:outline-none focus:border-brand-500 text-sm font-medium">
+              </div>
+              <div id="status-toggle-wrapper">
+                <label class="block text-xs font-bold uppercase text-surface-400 mb-1">Status</label>
+                <label class="relative inline-flex items-center cursor-pointer mt-1">
+                  <input type="checkbox" id="form-active" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-surface-200 dark:bg-surface-800 peer-focus:outline-none rounded-full peer peer-checked:after:transurface-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                  <span class="ml-2 text-xs font-bold text-surface-400 uppercase tracking-wider peer-checked:text-brand-500">Active</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="form-photo" class="block text-xs font-bold uppercase text-surface-400 mb-1">Labour Photo Profile</label>
+              <input type="file" id="form-photo" accept="image/*"
+                     class="w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-surface-100 dark:file:bg-surface-800 file:text-brand-500 hover:file:bg-surface-200 cursor-pointer">
+            </div>
+
+            <button type="submit"
+                    class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-brand-600/20 transition-all mt-2 active:scale-95">
+              Confirm & Save Profile
+            </button>
+          </form>
+        </div>
+      </div>
+      
+    </div>
+  </template>
+
+  <script src="js/config.js"></script>
+  <script src="js/config.js"></script><script src="js/api.js"></script>
+  <script src="js/splash.js"></script><script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/labours.js"></script>
+</body>
+</html>

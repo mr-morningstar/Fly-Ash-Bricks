@@ -1,14 +1,5 @@
 'use strict';
 
-window.fillAdminCredentials = function() {
-  const emailInput = document.getElementById('email');
-  const passInput = document.getElementById('password');
-  if (emailInput) emailInput.value = 'admin@devbricks.com';
-  if (passInput) passInput.value = 'Admin@123';
-  const errorDiv = document.getElementById('error-msg');
-  if (errorDiv) errorDiv.style.display = 'none';
-};
-
 window.togglePasswordVisibility = function() {
   const passInput = document.getElementById('password');
   const btn = document.getElementById('toggle-password-btn');

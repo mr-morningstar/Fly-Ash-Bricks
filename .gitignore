@@ -12,6 +12,7 @@ frontend/.env
 .env
 .env.local
 .env.*.local
+CREDENTIALS.md
 
 # ─── Uploads (user-generated files, not source code) ──────────
 backend/uploads/*
